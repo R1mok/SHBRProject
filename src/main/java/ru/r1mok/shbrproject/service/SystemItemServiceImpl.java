@@ -1,5 +1,6 @@
 package ru.r1mok.shbrproject.service;
 
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.r1mok.shbrproject.controllers.entities.Error;
@@ -11,7 +12,11 @@ import ru.r1mok.shbrproject.repository.entity.SystemItem;
 import ru.r1mok.shbrproject.repository.entity.SystemItemType;
 
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -24,7 +29,7 @@ public class SystemItemServiceImpl implements SystemItemService {
         this.systemItemRepository = systemItemRepository;
     }
 
-    private void setSizeAndDate(SystemItem item, int size, LocalDateTime updatedDate) {
+    private void setSizeAndDate(SystemItem item, int size, Instant updatedDate) {
         SystemItem parent = item.getParent();
         int previousSize = item.getSize();
         int delta = size - previousSize;
@@ -46,6 +51,13 @@ public class SystemItemServiceImpl implements SystemItemService {
                     throw new ServiceException();
                 else
                     IDsInRequest.add(item.getId());
+                Instant dateTime = systemItemImportRequest.getUpdateDate();
+
+
+                if (!DateTimeFormatter.ISO_INSTANT.format(dateTime).equals(dateTime.toString())) {
+                    throw new ServiceException();
+                }
+
             }
             for (SystemItemImport item : systemItemImportRequest.getItems()) {
                 Optional<SystemItem> elementExistInRepo = systemItemRepository.findById(item.getId());
@@ -68,6 +80,12 @@ public class SystemItemServiceImpl implements SystemItemService {
                             newParent.get().getChildren().add(elementInRepo);
                             elementInRepo.setParent(newParent.get());
                         }
+                        elementInRepo.setSize(0);
+                        setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
+                        elementInRepo.setSize(item.getSize());
+                    } else {
+                        setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
+                        elementInRepo.setSize(item.getSize());
                     }
                 }  else {
                     elementInRepo = SystemItem.builder()
@@ -90,6 +108,8 @@ public class SystemItemServiceImpl implements SystemItemService {
                         }
                         else throw new ServiceException();
                     }
+                    setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
+                    elementInRepo.setSize(item.getSize());
                 }
                 String parentId = item.getParentId();
                 if (parentId != null) {
@@ -97,9 +117,6 @@ public class SystemItemServiceImpl implements SystemItemService {
                     if (parent.isEmpty() || parent.get().getType().equals(SystemItemType.FILE)) {
                         throw new ServiceException();
                     }
-                    elementInRepo.setSize(0);
-                    setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
-                    elementInRepo.setSize(item.getSize());
                 }
                 if (item.getType().equals(SystemItemType.FOLDER)) {
                     if (item.getUrl() != null)
@@ -113,7 +130,7 @@ public class SystemItemServiceImpl implements SystemItemService {
                     if (item.getSize() <= 0)
                         throw new ServiceException();
                 }
-                LocalDateTime dateTime = systemItemImportRequest.getUpdateDate();
+                Instant dateTime = systemItemImportRequest.getUpdateDate();
                 elementInRepo.setDateTime(dateTime);
                 systemItemRepository.save(elementInRepo);
             }
@@ -148,7 +165,7 @@ public class SystemItemServiceImpl implements SystemItemService {
         }
     }
     @Override
-    public Error deleteItem(String id, LocalDateTime date) {
+    public Error deleteItem(String id, Instant date) {
         SystemItem item;
         try {
             item = this.getItem(id);

@@ -3,12 +3,21 @@ package ru.r1mok.shbrproject.service;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.r1mok.shbrproject.controllers.entities.SystemItemDTO;
 import ru.r1mok.shbrproject.repository.entity.SystemItem;
 import ru.r1mok.shbrproject.repository.entity.SystemItemType;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Mapper(imports = SystemItemType.class, componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SystemItemMapper {

@@ -4,6 +4,9 @@ spring:
     username: postgres
     password: admin
     driverClassName: org.postgresql.Driver
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   jpa:
     show_sql: true
     hibernate:

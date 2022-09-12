@@ -22,7 +22,9 @@ import ru.r1mok.shbrproject.repository.entity.SystemItemType;
 import ru.r1mok.shbrproject.service.SystemItemMapper;
 import ru.r1mok.shbrproject.service.SystemItemService;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @RestController
@@ -49,7 +51,7 @@ public class RESTControllers {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable String id, @RequestParam
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant date) {
         Error error;
         try {
             error = systemItemService.deleteItem(id, date);

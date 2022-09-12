@@ -7,9 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.r1mok.shbrproject.repository.entity.SystemItemType;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class SystemItemDTO implements Serializable {
     private String parentId;
 
     @Schema(description = "Последнее время изменения")
-    private LocalDateTime date;
+    private Instant date;
 
     @Schema(description = "Массив потомков")
     private List<SystemItemDTO> children;
