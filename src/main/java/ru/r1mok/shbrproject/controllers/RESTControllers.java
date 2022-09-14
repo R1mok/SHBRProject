@@ -79,10 +79,10 @@ public class RESTControllers {
     }
 
     // additionally
-    @GetMapping("updates")
+    /*@GetMapping("updates")
     public ResponseEntity<HttpStatus> update() {
         return ResponseEntity.ok(HttpStatus.OK);
-    }
+    }*/
 
 
 }

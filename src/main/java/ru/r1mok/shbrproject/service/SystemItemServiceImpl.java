@@ -57,7 +57,6 @@ public class SystemItemServiceImpl implements SystemItemService {
                 if (!DateTimeFormatter.ISO_INSTANT.format(dateTime).equals(dateTime.toString())) {
                     throw new ServiceException();
                 }
-
             }
             for (SystemItemImport item : systemItemImportRequest.getItems()) {
                 Optional<SystemItem> elementExistInRepo = systemItemRepository.findById(item.getId());
@@ -68,10 +67,10 @@ public class SystemItemServiceImpl implements SystemItemService {
                             (elementInRepo.getType().equals(SystemItemType.FILE) && item.getType().equals(SystemItemType.FOLDER))) {
                         throw new ServiceException();
                     }
-                    if (item.getParentId() == null) {
-                        elementInRepo.setParent(null);
-                    }
                     elementInRepo.setUrl(item.getUrl());
+                    if (elementInRepo.getParent() == null) {
+                        throw new ServiceException();
+                    }
                     if (!elementInRepo.getParent().getId().equals(item.getParentId())) {
                         elementInRepo.getParent().getChildren().remove(elementInRepo);
                         setSizeAndDate(elementInRepo, 0, systemItemImportRequest.getUpdateDate());
@@ -79,13 +78,15 @@ public class SystemItemServiceImpl implements SystemItemService {
                         if (newParent.isPresent()) {
                             newParent.get().getChildren().add(elementInRepo);
                             elementInRepo.setParent(newParent.get());
-                        }
+                        } else throw new ServiceException();
                         elementInRepo.setSize(0);
                         setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
                         elementInRepo.setSize(item.getSize());
                     } else {
-                        setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
-                        elementInRepo.setSize(item.getSize());
+                        if (elementInRepo.getType() != SystemItemType.FOLDER) {
+                            setSizeAndDate(elementInRepo, item.getSize(), systemItemImportRequest.getUpdateDate());
+                            elementInRepo.setSize(item.getSize());
+                        }
                     }
                 }  else {
                     elementInRepo = SystemItem.builder()
@@ -198,6 +199,5 @@ public class SystemItemServiceImpl implements SystemItemService {
         } catch (ServiceException e) {
             throw e;
         }
-
     }
 }
