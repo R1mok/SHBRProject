@@ -12,6 +12,9 @@ services:
       - "db-data:/var/lib/postgresql/data"
   app:
     image: r1mok/shbrproject
+    deploy:
+      restart_policy:
+        condition: on-failure
     environment:
       - PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/mydb
