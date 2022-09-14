@@ -10,7 +10,6 @@
     </parent>
     <groupId>ru.r1mok</groupId>
     <artifactId>SHBRProject</artifactId>
-    <version>1.0</version>
     <name>SHBRProject</name>
     <description>SHBRProject</description>
     <properties>
